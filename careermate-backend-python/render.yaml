@@ -1,0 +1,27 @@
+# render.yaml
+# Optional: lets you deploy via Render's "Blueprint" feature (New + >
+# Blueprint > pick this repo) instead of clicking through the dashboard
+# manually. Either approach works fine — see backend/README.md for the
+# manual steps too.
+
+services:
+  - type: web
+    name: careermate-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true          # Render generates a random secret for you
+      - key: CLIENT_ORIGIN
+        value: https://REPLACE-WITH-YOUR-FRONTEND-URL.onrender.com
+      - key: FLASK_ENV
+        value: production
+    # Free plan storage resets on every deploy/restart — fine for testing,
+    # NOT fine for real user data. Uncomment this (needs a paid instance
+    # type, e.g. "starter") to get a persistent disk for the SQLite file:
+    # disk:
+    #   name: careermate-data
+    #   mountPath: /opt/render/project/src/data
+    #   sizeGB: 1
